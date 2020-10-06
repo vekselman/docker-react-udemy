@@ -1,0 +1,37 @@
+version: '3'
+services: 
+    web:
+        build:
+            # To set another docker file to be build
+            context: .
+            dockerfile: Dockerfile.dev
+            ###
+        ports:
+            - "3000:3000"
+        volumes: 
+            - /app/node_modules
+            - .:/app
+        #In windows to allow automatically reloading afer change
+        environment: 
+            - CHOKIDAR_USEPOLLING=true
+        ###
+        stdin_open: "true"
+    # Service in order to perform tests
+    tests:
+        build:
+            # To set another docker file to be build
+            context: .
+            dockerfile: Dockerfile.dev
+            ###
+        volumes: 
+            - /app/node_modules
+            - .:/app
+        # To ovveride default start command that specifed in
+        # Docker File
+        command: ["npm","run","test"]
+        ###
+        #In windows to allow automatically reloading afer change
+        environment: 
+            - CHOKIDAR_USEPOLLING=true
+        ###
+        stdin_open: "true"
