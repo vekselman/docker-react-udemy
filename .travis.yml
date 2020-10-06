@@ -1,0 +1,12 @@
+# Tels that we need to be super user
+sudo: required
+# What must be installed 
+services:
+    - docker
+
+before_install:
+    - docker build -t vekselman/docker-react-udemy -f Dockerfile.dev .
+
+script:
+    # Due to a change in how the Jest library works need add env variable CI=true
+    - docker run -e CI=true vekselman/docker-react-udemy npm run test
