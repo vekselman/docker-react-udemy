@@ -1,12 +1,38 @@
 # Tels that we need to be super user
 sudo: required
+# 1. Tell Travis we need a copy of docker running 
 # What must be installed 
 services:
     - docker
 
+# 2. Build our image using Dockerfile.dev
 before_install:
     - docker build -t vekselman/docker-react-udemy -f Dockerfile.dev .
 
+# 3. Tell Travis how to run our test suite
 script:
     # Due to a change in how the Jest library works need add env variable CI=true
+    # in order to exit automatically after test
     - docker run -e CI=true vekselman/docker-react-udemy npm run test
+     
+# 4. 
+deploy:
+    # All info must be taken from AWS app env
+    # For instance https://us-east-2.console.aws.amazon.com/elasticbeanstalk/home?region=us-east-2#/environment/dashboard?applicationName=docker-react-udemy&environmentId=e-m3j2pezc4j
+    provider: elasticbeanstalk
+    region: "us-east-2"
+    app: "docker-react-udemy"
+    env: "DockerReactUdemy-env"
+    # Name that travis will put to the zipped code
+    # In aws is S3 bucket that elastic created
+    bucket_name: "elasticbeanstalk-us-east-2-210346886556"
+    bucket_path: "docker-react-udemy"
+    # In order to push to aws prod just when pushed to master in github
+    on:
+        branch: master
+    # To access to aws with. Specify creds. Create thous in aws IAM service
+    # access_key_id: $AWS_ACCESS_KEY
+    # secret_access_key: $AWS_SECRET_KEY  
+    # thous variables we need to put in travis settings for hiding tham from all th world.  
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY  
